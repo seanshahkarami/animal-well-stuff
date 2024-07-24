@@ -1,5 +1,5 @@
 """
-Awesome work by the community collaborating together to collect all puzzle pieces!
+Awesome work by the community on collaborating to collect all puzzle pieces!
 
 I took this as my starting point to show how you can just "turn the crank" to find
 a possible solution.
