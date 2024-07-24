@@ -2,7 +2,8 @@
 Awesome work by the community on collaborating to collect all puzzle pieces!
 
 I took this as my starting point to show how you can just "turn the crank" to find
-a possible solution.
+a possible solution. Haha... I wanted to at least put in some kind of effort towards
+solving this!
 
 It turns out there's exactly one, by the way! I thought it'd be interesting if there
 was some secret alternative, possibly nonsensical, mural which unlocked something else.
