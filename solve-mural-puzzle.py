@@ -4,8 +4,8 @@ Awesome work by the community on collaborating to collect all puzzle pieces!
 I took this as my starting point to show how you can just "turn the crank" to find
 a possible solution.
 
-It turns out there's exactly one solution! (I wanted to see if there was some secret
-alternative, possibly nonsense, mural which unlocked something else.)
+It turns out there's exactly one, by the way! I thought it'd be interesting if there
+was some secret alternative, possibly nonsensical, mural which unlocked something else.
 """
 
 from dataclasses import dataclass
