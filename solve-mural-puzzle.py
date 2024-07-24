@@ -1,6 +1,16 @@
+"""
+Awesome work by the community collaborating together to collect all puzzle pieces!
+
+I took this as my starting point to show how you can just "turn the crank" to find
+a possible solution.
+
+It turns out there's exactly one solution! (I wanted to see if there was some secret
+alternative, possibly nonsense, mural which unlocked something else.)
+"""
+
 from dataclasses import dataclass
 
-data = """
+piece_data = """
 3301
 WYYY
 WWYY
@@ -320,7 +330,7 @@ class Piece:
 # load piece data
 pieces = []
 
-items = data.split()
+items = piece_data.split()
 
 while items:
     code = items[0]
@@ -413,30 +423,31 @@ def find_next_candidates():
     return best_x, best_y, best_candidates
 
 
-def solve_puzzle():
-    x, y, candidates = find_next_candidates()
+solutions = []
 
-    # if there are no more candidates then stop
-    if candidates is None:
-        render_puzzle()
-        return True
+
+def solve_puzzle():
+    # we've found a solution if we've used all the pieces
+    if all(p.used for p in pieces):
+        solutions.append(render_puzzle())
+        return
+
+    # otherwise, look for the next candidate location to place a piece
+    x, y, candidates = find_next_candidates()
 
     for p in candidates:
         # mark puzzle location and piece as used
         puzzle[y][x] = p
         p.used = True
-        render_puzzle()
-        if solve_puzzle():
-            return True
+        # recursively solve remainder of puzzle
+        solve_puzzle()
         # unmark puzzle location and piece
         puzzle[y][x] = None
         p.used = False
-    return False
 
 
 def render_puzzle():
-    output = "\033c\033[0m"
-
+    output = ""
     for y in rangeinc(TOP, BOTTOM):
         for j in range(4):
             for x in rangeinc(LEFT, RIGHT):
@@ -458,7 +469,13 @@ def render_puzzle():
                         raise ValueError("Invalid color")
             output += "\n"
     output += "\033[0m"
-    print(output)
+    return output
 
 
 solve_puzzle()
+
+print(f"FOUND {len(solutions)} SOLUTION")
+print()
+
+for solution in solutions:
+    print(solution)
