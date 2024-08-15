@@ -344,18 +344,19 @@ while items:
     items = items[5:]
 
 
-# helper func to do include range without writing + 1 everywhere
-def rangeinc(a, b):
-    return range(a, b + 1)
+WIDTH = 10
+HEIGHT = 5
 
 
-LEFT = 0
-RIGHT = 9
-TOP = 0
-BOTTOM = 4
+puzzle = [None] * (WIDTH * HEIGHT)
 
 
-puzzle = [[None for _ in rangeinc(LEFT, RIGHT)] for _ in rangeinc(TOP, BOTTOM)]
+def get_piece(x, y):
+    return puzzle[y * WIDTH + x]
+
+
+def set_piece(x, y, p):
+    puzzle[y * WIDTH + x] = p
 
 
 def piece_fits(p: Piece, x: int, y: int):
@@ -368,36 +369,36 @@ def piece_fits(p: Piece, x: int, y: int):
 
 
 def piece_fits_left(p: Piece, x: int, y: int) -> bool:
-    if x <= LEFT:
+    if x <= 0:
         return p.left == 0
-    p2 = puzzle[y][x - 1]
+    p2 = get_piece(x - 1, y)
     if p2 is None:
         return True
     return p.left == p2.right
 
 
 def piece_fits_right(p: Piece, x: int, y: int) -> bool:
-    if x >= RIGHT:
+    if x >= WIDTH - 1:
         return p.right == 0
-    p2 = puzzle[y][x + 1]
+    p2 = get_piece(x + 1, y)
     if p2 is None:
         return True
     return p.right == p2.left
 
 
 def piece_fits_up(p: Piece, x: int, y: int) -> bool:
-    if y <= TOP:
+    if y <= 0:
         return p.up == 0
-    p2 = puzzle[y - 1][x]
+    p2 = get_piece(x, y - 1)
     if p2 is None:
         return True
     return p.up == p2.down
 
 
 def piece_fits_down(p: Piece, x: int, y: int) -> bool:
-    if y >= BOTTOM:
+    if y >= HEIGHT - 1:
         return p.down == 0
-    p2 = puzzle[y + 1][x]
+    p2 = get_piece(x, y + 1)
     if p2 is None:
         return True
     return p.down == p2.up
@@ -408,9 +409,9 @@ def find_next_candidates():
     best_y = None
     best_candidates = None
 
-    for y in rangeinc(TOP, BOTTOM):
-        for x in rangeinc(LEFT, RIGHT):
-            if puzzle[y][x] is not None:
+    for y in range(HEIGHT):
+        for x in range(WIDTH):
+            if get_piece(x, y) is not None:
                 continue
             # find unused pieces candidates which fit
             candidates = [p for p in pieces if not p.used and piece_fits(p, x, y)]
@@ -438,22 +439,22 @@ def solve_puzzle():
 
     for p in candidates:
         # mark puzzle location and piece as used
-        puzzle[y][x] = p
+        set_piece(x, y, p)
         p.used = True
         # recursively solve remainder of puzzle
         solve_puzzle()
         # unmark puzzle location and piece
-        puzzle[y][x] = None
+        set_piece(x, y, None)
         p.used = False
 
 
 def render_puzzle():
     output = ""
-    for y in rangeinc(TOP, BOTTOM):
+    for y in range(HEIGHT):
         for j in range(4):
-            for x in rangeinc(LEFT, RIGHT):
+            for x in range(WIDTH):
                 for i in range(4):
-                    piece = puzzle[y][x]
+                    piece = get_piece(x, y)
                     if piece is None:
                         output += "\033[0;30m?"
                         continue
