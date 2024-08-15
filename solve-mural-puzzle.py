@@ -344,64 +344,64 @@ while items:
     items = items[5:]
 
 
-WIDTH = 10
-HEIGHT = 5
+class Puzzle:
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.pieces = [None] * (width * height)
+
+    def get_piece(self, x: int, y: int) -> Piece:
+        return self.pieces[y * self.width + x]
+
+    def set_piece(self, x: int, y: int, p: Piece):
+        self.pieces[y * self.width + x] = p
+
+    def clear_piece(self, x: int, y: int):
+        self.pieces[y * self.width + x] = None
+
+    def piece_fits(self, p: Piece, x: int, y: int) -> bool:
+        return (
+            self.piece_fits_left(p, x, y)
+            and self.piece_fits_right(p, x, y)
+            and self.piece_fits_down(p, x, y)
+            and self.piece_fits_up(p, x, y)
+        )
+
+    def piece_fits_left(self, p: Piece, x: int, y: int) -> bool:
+        if x <= 0:
+            return p.left == 0
+        p2 = self.get_piece(x - 1, y)
+        if p2 is None:
+            return True
+        return p.left == p2.right
+
+    def piece_fits_right(self, p: Piece, x: int, y: int) -> bool:
+        if x >= self.width - 1:
+            return p.right == 0
+        p2 = self.get_piece(x + 1, y)
+        if p2 is None:
+            return True
+        return p.right == p2.left
+
+    def piece_fits_up(self, p: Piece, x: int, y: int) -> bool:
+        if y <= 0:
+            return p.up == 0
+        p2 = self.get_piece(x, y - 1)
+        if p2 is None:
+            return True
+        return p.up == p2.down
+
+    def piece_fits_down(self, p: Piece, x: int, y: int) -> bool:
+        if y >= self.height - 1:
+            return p.down == 0
+        p2 = self.get_piece(x, y + 1)
+        if p2 is None:
+            return True
+        return p.down == p2.up
 
 
-puzzle = [None] * (WIDTH * HEIGHT)
-
-
-def get_piece(x, y):
-    return puzzle[y * WIDTH + x]
-
-
-def set_piece(x, y, p):
-    puzzle[y * WIDTH + x] = p
-
-
-def piece_fits(p: Piece, x: int, y: int):
-    return (
-        piece_fits_left(p, x, y)
-        and piece_fits_right(p, x, y)
-        and piece_fits_down(p, x, y)
-        and piece_fits_up(p, x, y)
-    )
-
-
-def piece_fits_left(p: Piece, x: int, y: int) -> bool:
-    if x <= 0:
-        return p.left == 0
-    p2 = get_piece(x - 1, y)
-    if p2 is None:
-        return True
-    return p.left == p2.right
-
-
-def piece_fits_right(p: Piece, x: int, y: int) -> bool:
-    if x >= WIDTH - 1:
-        return p.right == 0
-    p2 = get_piece(x + 1, y)
-    if p2 is None:
-        return True
-    return p.right == p2.left
-
-
-def piece_fits_up(p: Piece, x: int, y: int) -> bool:
-    if y <= 0:
-        return p.up == 0
-    p2 = get_piece(x, y - 1)
-    if p2 is None:
-        return True
-    return p.up == p2.down
-
-
-def piece_fits_down(p: Piece, x: int, y: int) -> bool:
-    if y >= HEIGHT - 1:
-        return p.down == 0
-    p2 = get_piece(x, y + 1)
-    if p2 is None:
-        return True
-    return p.down == p2.up
+puzzle = Puzzle(width=10, height=5)
 
 
 def find_next_candidates():
@@ -409,12 +409,14 @@ def find_next_candidates():
     best_y = None
     best_candidates = None
 
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-            if get_piece(x, y) is not None:
+    for y in range(puzzle.height):
+        for x in range(puzzle.width):
+            if puzzle.get_piece(x, y) is not None:
                 continue
             # find unused pieces candidates which fit
-            candidates = [p for p in pieces if not p.used and piece_fits(p, x, y)]
+            candidates = [
+                p for p in pieces if not p.used and puzzle.piece_fits(p, x, y)
+            ]
 
             if best_candidates is None or len(candidates) < len(best_candidates):
                 best_x = x
@@ -439,22 +441,22 @@ def solve_puzzle():
 
     for p in candidates:
         # mark puzzle location and piece as used
-        set_piece(x, y, p)
+        puzzle.set_piece(x, y, p)
         p.used = True
         # recursively solve remainder of puzzle
         solve_puzzle()
         # unmark puzzle location and piece
-        set_piece(x, y, None)
+        puzzle.clear_piece(x, y)
         p.used = False
 
 
 def render_puzzle():
     output = ""
-    for y in range(HEIGHT):
+    for y in range(puzzle.height):
         for j in range(4):
-            for x in range(WIDTH):
+            for x in range(puzzle.width):
                 for i in range(4):
-                    piece = get_piece(x, y)
+                    piece = puzzle.get_piece(x, y)
                     if piece is None:
                         output += "\033[0;30m?"
                         continue
